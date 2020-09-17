@@ -184,7 +184,15 @@ class TestEmployees {
 
 	@Test
 	void testGetEmployeesBySalariesInterval() {
+		MinMaxSalaryEmployees[] expected = {
+				new MinMaxSalaryEmployees(1000, 2000, Arrays.asList(empl1)),
+				new MinMaxSalaryEmployees(2000, 3000, Arrays.asList(empl2)),
+				new MinMaxSalaryEmployees(3000, 4000, Arrays.asList(empl3)),
+				new MinMaxSalaryEmployees(4000, 5000, Arrays.asList(empl4))
+		};
 		
+		MinMaxSalaryEmployees[] actual = employeesService.getEmployeesBySalariesInterval(1000);
+		assertArrayEquals(expected, actual);
 
 	}
 

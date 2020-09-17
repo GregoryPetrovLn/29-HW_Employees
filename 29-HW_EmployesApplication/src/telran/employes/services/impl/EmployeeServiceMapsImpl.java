@@ -180,32 +180,42 @@ public class EmployeeServiceMapsImpl implements EmployeeService {
 
 	@Override
 	public DepartmentSalary[] getDepartmentAvgSalaryDistribution() {
-		Map<String, Double> avgSalaryByDepartments = employees
-				.entrySet()
-				.stream().map(x -> x.getValue())
-				.collect(Collectors.groupingBy(Employee::getDepartment,
-						Collectors.averagingDouble(Employee::getSalary)));
-		
-	
-		
-		List<DepartmentSalary> result =  avgSalaryByDepartments
-				.entrySet()
-				.stream()
-				.map(e -> new DepartmentSalary(e.getKey(), e.getValue()))
-				.sorted((f1, f2) -> Double.compare(f2.getAvgSalary(), f1.getAvgSalary()))
-				.collect(Collectors.toList());
+//		Map<String, Double> avgSalaryByDepartments = employees
+//				.entrySet()
+//				.stream().map(x -> x.getValue())
+//				.collect(Collectors.groupingBy(Employee::getDepartment,
+//						Collectors.averagingDouble(Employee::getSalary)));
+//		
+//	
+//		
+//		List<DepartmentSalary> result =  avgSalaryByDepartments
+//				.entrySet()
+//				.stream()
+//				.map(e -> new v(e.getKey(), e.getValue()))
+//				.sorted((f1, f2) -> Double.compare(f2.getAvgSalary(), f1.getAvgSalary()))
+//				.collect(Collectors.toList());
 
-		return result.toArray(new DepartmentSalary[0]);
+		return employees.values().stream()
+				.collect(
+						Collectors.groupingBy(Employee::getDepartment, Collectors.averagingDouble(Employee::getSalary)))
+				.entrySet().stream().sorted((e1, e2) -> Double.compare(e2.getValue(), e1.getValue()))
+				.map(e -> new DepartmentSalary(e.getKey(), e.getValue())).toArray(DepartmentSalary[]::new);
+
 	}
 
 	@Override
 	public MinMaxSalaryEmployees[] getEmployeesBySalariesInterval(int interval) {
-		
-		//completely incomprehensible method 
-		
-		
-		
-		return null;
+
+		return employees.values().stream().collect(Collectors.groupingBy(e -> e.getSalary() / interval)).entrySet()
+				.stream().map(e -> {
+					int minSalary = e.getKey() * interval;
+					int maxSalary = minSalary + interval;
+					List<Employee> employees = e.getValue();
+					employees.sort((e1, e2) -> e1.getSalary() - e2.getSalary());
+					return new MinMaxSalaryEmployees(minSalary, maxSalary, employees);
+				}).sorted((m1, m2) -> Integer.compare(m1.getMinSalary(), m2.getMinSalary()))
+				.toArray(MinMaxSalaryEmployees[]::new);
+
 	}
 
 }
