@@ -206,14 +206,18 @@ public class EmployeeServiceMapsImpl implements EmployeeService {
 	@Override
 	public MinMaxSalaryEmployees[] getEmployeesBySalariesInterval(int interval) {
 
-		return employees.values().stream().collect(Collectors.groupingBy(e -> e.getSalary() / interval)).entrySet()
+		return employees.values().stream()
+				.collect(Collectors.groupingBy(e -> e.getSalary() / interval))
+				.entrySet()
 				.stream().map(e -> {
 					int minSalary = e.getKey() * interval;
 					int maxSalary = minSalary + interval;
 					List<Employee> employees = e.getValue();
 					employees.sort((e1, e2) -> e1.getSalary() - e2.getSalary());
+					
 					return new MinMaxSalaryEmployees(minSalary, maxSalary, employees);
-				}).sorted((m1, m2) -> Integer.compare(m1.getMinSalary(), m2.getMinSalary()))
+				})
+				.sorted((m1, m2) -> Integer.compare(m1.getMinSalary(), m2.getMinSalary()))
 				.toArray(MinMaxSalaryEmployees[]::new);
 
 	}
